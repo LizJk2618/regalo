@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🎟️ Champetazo Fest</title>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=DM+Sans:wght@300;400;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { height:100%; }
+
+body {
+  min-height:100vh;
+  background:radial-gradient(ellipse at 50% 30%,#2d0a00,#0a0000 70%);
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+  padding:24px 20px 40px;
+  font-family:'DM Sans',sans-serif;
+  overflow-y:auto; overflow-x:hidden;
+  position:relative;
+}
+
+.bg-particle {
+  position:fixed; border-radius:50%; pointer-events:none;
+  animation:bgFloat var(--d,5s) var(--dl,0s) ease-in-out infinite; z-index:0;
+}
+@keyframes bgFloat { 0%,100%{transform:translateY(0) scale(1);opacity:.4} 50%{transform:translateY(-20px) scale(1.1);opacity:.8} }
+
+.confetti-piece {
+  position:fixed; top:-20px; pointer-events:none; z-index:5;
+  border-radius:var(--br,2px);
+  animation:confFall var(--d,3s) var(--dl,0s) ease-in infinite;
+}
+@keyframes confFall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(105vh) rotate(720deg);opacity:0} }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pop    { from{opacity:0;transform:scale(.6)} to{opacity:1;transform:scale(1)} }
+@keyframes shine  { from{transform:translateX(-100%) rotate(45deg)} to{transform:translateX(200%) rotate(45deg)} }
+@keyframes glow   { 0%,100%{box-shadow:0 0 30px rgba(255,107,53,.5),0 0 60px rgba(255,23,68,.2)} 50%{box-shadow:0 0 60px rgba(255,107,53,.9),0 0 100px rgba(255,23,68,.5)} }
+@keyframes float  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+@keyframes spin   { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+.sparkle {
+  position:fixed; pointer-events:none; z-index:1;
+  animation:sparklePop var(--d,3s) var(--dl,0s) ease-in-out infinite;
+  font-size:var(--fs,18px);
+}
+@keyframes sparklePop { 0%,100%{opacity:0;transform:scale(.4)} 50%{opacity:1;transform:scale(1)} }
+
+/* ===== CONTENIDO ===== */
+.page-header {
+  position:relative; z-index:10; text-align:center; margin-bottom:24px;
+  animation:fadeUp .6s .2s both;
+}
+.page-header h1 {
+  font-family:'Pacifico',cursive;
+  color:#FFD700; font-size:28px;
+  text-shadow:2px 2px 0 rgba(0,0,0,.5),0 0 30px rgba(255,215,0,.6);
+  margin-bottom:6px;
+}
+.page-header p {
+  font-family:'Caveat',cursive; color:rgba(255,200,100,.7);
+  font-size:18px; letter-spacing:1px;
+}
+
+.boleta-wrap {
+  position:relative; z-index:10;
+  width:100%; max-width:360px;
+  display:flex; flex-direction:column; align-items:center; gap:16px;
+  animation:fadeUp .7s .4s both;
+}
+
+.boleta-frame {
+  width:100%; border-radius:16px; overflow:hidden; position:relative;
+  box-shadow:
+    0 0 50px rgba(255,107,53,.7),
+    0 0 100px rgba(255,23,68,.3),
+    0 0 0 3px rgba(255,215,0,.6);
+  animation:pop .7s .4s both, glow 2s 1.2s ease-in-out infinite;
+}
+.boleta-frame::after {
+  content:''; position:absolute; inset:0; z-index:2; pointer-events:none;
+  background:linear-gradient(45deg,transparent 30%,rgba(255,255,255,.1) 50%,transparent 70%);
+  animation:shine 3s ease-in-out infinite;
+}
+.boleta-frame img {
+  width:100%; display:block; border-radius:14px;
+}
+
+.boleta-badge {
+  background:linear-gradient(135deg,#FF1744,#FF6B35);
+  color:#FFD700; font-family:'Pacifico',cursive; font-size:18px;
+  padding:10px 28px; border-radius:50px;
+  box-shadow:0 4px 20px rgba(255,23,68,.5);
+  animation:fadeUp .5s .7s both; letter-spacing:1px;
+  text-align:center;
+}
+
+.boleta-msg {
+  font-family:'Caveat',cursive; color:rgba(255,215,0,.85);
+  font-size:22px; text-align:center;
+  animation:fadeUp .5s .9s both; line-height:1.4;
+}
+</style>
+</head>
+<body>
+
+<!-- PARTÍCULAS FONDO -->
+<div id="bgParticles"></div>
+
+<!-- SPARKLES -->
+<div class="sparkle" style="--fs:22px;--d:2.5s;--dl:0s;top:8%;left:6%">🔥</div>
+<div class="sparkle" style="--fs:16px;--d:3s;--dl:.5s;top:12%;right:8%">✨</div>
+<div class="sparkle" style="--fs:20px;--d:2s;--dl:1s;bottom:20%;left:5%">🌟</div>
+<div class="sparkle" style="--fs:18px;--d:3.5s;--dl:.3s;bottom:15%;right:6%">⭐</div>
+<div class="sparkle" style="--fs:14px;--d:2.8s;--dl:.8s;top:50%;left:3%">🎵</div>
+<div class="sparkle" style="--fs:16px;--d:2.2s;--dl:1.2s;top:40%;right:4%">🎶</div>
+
+<!-- CABECERA -->
+<div class="page-header">
+  <h1>🎟️ Champetazo Fest 🎟️</h1>
+  <p>Tu sorpresa ha llegado 🔥</p>
+</div>
+
+<!-- BOLETA DIRECTA -->
+<div class="boleta-wrap">
+  <div class="boleta-frame">
+    <img src="boleta.jpg" alt="Boleta Champetazo Fest">
+  </div>
+
+  <div class="boleta-badge">🔥 CHAMPETIZA FEST 🔥</div>
+
+  <div class="boleta-msg">
+    🎊 ¡Te amo mi amor!<br>
+    ¡Disfrútalo vida mia! 🎊
+  </div>
+</div>
+
+<script>
+// Partículas de fondo
+const bp = document.getElementById('bgParticles');
+const bColors = ['rgba(255,107,53,.4)','rgba(255,23,68,.3)','rgba(255,215,0,.2)','rgba(255,150,0,.3)'];
+for(let i=0;i<25;i++){
+  const d=document.createElement('div');
+  const s=4+Math.random()*10;
+  d.className='bg-particle';
+  d.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${s}px;height:${s}px;border-radius:50%;background:${bColors[Math.floor(Math.random()*bColors.length)]};--d:${3+Math.random()*5}s;--dl:${Math.random()*3}s`;
+  bp.appendChild(d);
+}
+
+// Confetti al cargar
+function launchConfetti(){
+  const colors=['#FF1744','#FFD700','#FF6B35','#00E676','#2979FF','#FF4081','#E040FB','#00BCD4'];
+  for(let i=0;i<70;i++){
+    const c=document.createElement('div');
+    c.className='confetti-piece';
+    const isCircle=Math.random()>.5;
+    c.style.cssText=`
+      left:${Math.random()*100}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      width:${5+Math.random()*9}px;
+      height:${5+Math.random()*9}px;
+      --br:${isCircle?'50%':'2px'};
+      --d:${2+Math.random()*3}s;
+      --dl:${Math.random()*2}s;
+    `;
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(), 6000);
+  }
+}
+
+window.addEventListener('load', ()=>{
+  launchConfetti();
+  setTimeout(launchConfetti, 800);
+  setTimeout(launchConfetti, 1600);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>¡Mundo Mario! 🍄</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { height:100%; overflow:hidden; }
+
+body {
+  min-height:100vh;
+  background:linear-gradient(180deg,#5C94FC 0%,#5C94FC 55%,#2ECC40 55%,#27AE36 65%,#8B4513 65%,#6B3410 100%);
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:flex-start; overflow-y:auto; overflow-x:hidden;
+  padding-bottom:20px;
+}
+
+/* ===== CIELO ===== */
+.sky-layer { position:fixed; top:0; left:0; right:0; height:55%; pointer-events:none; z-index:0; }
+
+/* nubes pixel */
+.cloud-pixel {
+  position:absolute; background:#fff;
+  box-shadow:16px 0 0 #fff,-16px 0 0 #fff,0 -10px 0 #fff,16px -10px 0 #fff,-16px -10px 0 #fff,
+             32px 0 0 #fff,-32px 0 0 #fff,0 -20px 0 #fff,16px -20px 0 #fff,-16px -20px 0 #fff;
+  width:16px; height:10px;
+  animation:cloudMove var(--d,20s) var(--dl,0s) linear infinite;
+}
+@keyframes cloudMove { from{transform:translateX(-150px)} to{transform:translateX(calc(100vw + 150px))} }
+
+/* sol pixel */
+.sun-pixel {
+  position:absolute; top:16px; right:20px;
+  width:40px; height:40px;
+  background:#FFD700;
+  box-shadow:0 0 0 4px #FFD700;
+}
+
+/* ===== PISO ===== */
+.ground { position:fixed; bottom:0; left:0; right:0; height:35%; pointer-events:none; z-index:0; }
+.ground-top {
+  height:30px;
+  background:repeating-linear-gradient(90deg,#2ECC40 0,#2ECC40 30px,#27AE36 30px,#27AE36 60px);
+}
+.ground-mid {
+  height:calc(100% - 30px);
+  background:repeating-linear-gradient(90deg,#8B4513 0,#8B4513 30px,#6B3410 30px,#6B3410 60px);
+}
+
+/* ===== MARIO ===== */
+.mario-sprite {
+  position:fixed; bottom:calc(35% + 24px); left:16px; z-index:5;
+  font-size:36px; line-height:1;
+  animation:marioWalk 0.5s steps(1) infinite;
+  filter:drop-shadow(2px 4px 0 rgba(0,0,0,.4));
+}
+@keyframes marioWalk { 0%{transform:scaleX(1) translateY(0)} 50%{transform:scaleX(1) translateY(-3px)} 100%{transform:scaleX(1) translateY(0)} }
+
+/* ===== LUIGI ===== */
+.luigi-sprite {
+  position:fixed; bottom:calc(35% + 24px); right:16px; z-index:5;
+  font-size:36px; line-height:1;
+  animation:luigiWalk 0.6s steps(1) infinite;
+  filter:drop-shadow(2px 4px 0 rgba(0,0,0,.4));
+}
+@keyframes luigiWalk { 0%{transform:scaleX(-1) translateY(0)} 50%{transform:scaleX(-1) translateY(-4px)} 100%{transform:scaleX(-1) translateY(0)} }
+
+/* ===== TUBERÍAS ===== */
+.pipe {
+  position:fixed; bottom:calc(35% - 4px); z-index:3;
+  display:flex; flex-direction:column; align-items:center;
+}
+.pipe-top { width:44px; height:14px; background:linear-gradient(to right,#1a7a1a,#2ECC40,#1a7a1a); border-radius:3px 3px 0 0; }
+.pipe-body { width:36px; height:50px; background:linear-gradient(to right,#1a7a1a,#2ECC40,#1a7a1a); }
+
+/* ===== MONEDAS FLOTANTES ===== */
+.coin-float {
+  position:absolute; font-size:16px;
+  animation:coinSpin 1s steps(4) infinite;
+}
+@keyframes coinSpin { 0%{transform:scaleX(1)} 25%{transform:scaleX(.5)} 50%{transform:scaleX(0)} 75%{transform:scaleX(.5)} 100%{transform:scaleX(1)} }
+
+/* ===== CONTENIDO PRINCIPAL ===== */
+.main-content {
+  position:relative; z-index:10;
+  width:100%; display:flex; flex-direction:column; align-items:center;
+  padding:12px 12px 0;
+}
+
+.mario-title {
+  font-family:'Press Start 2P',cursive;
+  color:#fff; font-size:11px;
+  text-shadow:3px 3px 0 #8B4513,-1px -1px 0 #333;
+  text-align:center; margin-bottom:14px;
+  animation:titleBounce .5s ease-in-out infinite alternate;
+  background:rgba(0,0,0,.3); padding:8px 12px; border-radius:4px;
+}
+@keyframes titleBounce { from{transform:translateY(0)} to{transform:translateY(-3px)} }
+
+.score-bar {
+  font-family:'Press Start 2P',cursive;
+  color:#FFD700; font-size:8px;
+  display:flex; gap:16px; margin-bottom:16px;
+  text-shadow:2px 2px 0 #333;
+}
+
+/* ===== CAJAS ===== */
+.boxes-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+  width:100%; max-width:340px; margin-bottom:14px;
+}
+
+.mario-box {
+  aspect-ratio:1;
+  background:linear-gradient(135deg,#F7C948,#E8A800);
+  border-radius:6px; border:3px solid #8B6914;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; position:relative; overflow:visible;
+  box-shadow:inset 0 -4px 0 rgba(0,0,0,.25),0 4px 0 rgba(0,0,0,.35),3px 3px 0 rgba(0,0,0,.2);
+  transition:transform .1s;
+  animation:boxIdle 1s ease-in-out infinite alternate;
+  animation-delay:calc(var(--i,0) * .15s);
+}
+@keyframes boxIdle { from{transform:translateY(0)} to{transform:translateY(-3px)} }
+
+.mario-box:active { transform:translateY(4px) !important; box-shadow:inset 0 -1px 0 rgba(0,0,0,.25),0 1px 0 rgba(0,0,0,.35) !important; }
+
+.mario-box.opened {
+  background:linear-gradient(135deg,#888,#666);
+  border-color:#444; cursor:default; animation:none;
+}
+
+/* signo de interrogación estilo pixel */
+.box-q {
+  font-family:'Press Start 2P',cursive;
+  font-size:22px; color:#8B4513;
+  text-shadow:1px 1px 0 rgba(255,255,255,.5);
+  pointer-events:none;
+}
+.mario-box.opened .box-q { display:none; }
+
+/* estrella que sale al golpear */
+.box-pop {
+  position:absolute; top:-36px; left:50%; transform:translateX(-50%);
+  font-size:24px; pointer-events:none;
+  animation:popFly .6s ease forwards;
+  z-index:20;
+}
+@keyframes popFly {
+  0%{transform:translateX(-50%) translateY(0);opacity:1}
+  100%{transform:translateX(-50%) translateY(-50px);opacity:0}
+}
+
+/* CAJA 6 especial - video */
+.mario-box.video-box { border-color:#FF1744; background:linear-gradient(135deg,#FF6B35,#FF1744); animation:videoBoxPulse 1s ease-in-out infinite alternate; }
+@keyframes videoBoxPulse { from{box-shadow:inset 0 -4px 0 rgba(0,0,0,.25),0 4px 0 rgba(0,0,0,.35),0 0 10px rgba(255,23,68,.4)} to{box-shadow:inset 0 -4px 0 rgba(0,0,0,.25),0 4px 0 rgba(0,0,0,.35),0 0 25px rgba(255,23,68,.8)} }
+.mario-box.video-box .box-q { color:#FFD700; }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position:fixed; inset:0; z-index:100;
+  background:rgba(0,0,0,.85); backdrop-filter:blur(4px);
+  display:none; flex-direction:column; align-items:center; justify-content:center;
+  padding:24px 20px;
+}
+.modal-overlay.show { display:flex; }
+
+.modal-content {
+  width:100%; max-width:320px;
+  background:#1a0a2e; border-radius:16px;
+  padding:24px 20px; text-align:center;
+  border:3px solid var(--gold,#FFD700);
+  box-shadow:0 0 40px rgba(255,215,0,.3);
+  animation:modalPop .4s cubic-bezier(.34,1.56,.64,1);
+  position:relative; overflow:hidden;
+}
+@keyframes modalPop { from{transform:scale(.5);opacity:0} to{transform:scale(1);opacity:1} }
+
+.modal-title {
+  font-family:'Press Start 2P',cursive;
+  color:#FFD700; font-size:9px; margin-bottom:14px;
+  text-shadow:2px 2px 0 #333;
+}
+
+.modal-photo {
+  width:100%; aspect-ratio:1; border-radius:10px;
+  background:linear-gradient(135deg,#222,#111);
+  display:flex; align-items:center; justify-content:center;
+  font-size:70px; margin-bottom:14px;
+  border:2px solid rgba(255,215,0,.3);
+  overflow:hidden;
+}
+.modal-photo img, .modal-photo video {
+  width:100%; height:100%; object-fit:cover; border-radius:8px;
+}
+.modal-label {
+  font-family:'DM Sans',sans-serif; color:#fff; font-size:16px; margin-bottom:16px;
+}
+.modal-close {
+  background:linear-gradient(135deg,#7B1FA2,#9C27B0);
+  color:#fff; border:none; border-radius:50px;
+  padding:12px 32px; font-family:'DM Sans',sans-serif;
+  font-size:14px; letter-spacing:1px; cursor:pointer;
+  box-shadow:0 4px 20px rgba(138,43,226,.4);
+}
+
+/* ===== BOTÓN SIGUIENTE ===== */
+.next-btn {
+  display:none; align-items:center; justify-content:center; gap:8px;
+  background:linear-gradient(135deg,#2ECC40,#27AE36);
+  color:#fff; font-family:'Press Start 2P',cursive; font-size:9px;
+  padding:14px 24px; border-radius:6px; border:none; cursor:pointer;
+  box-shadow:0 4px 0 #1a7a1a,3px 3px 0 rgba(0,0,0,.3);
+  margin-top:4px; text-shadow:1px 1px 0 rgba(0,0,0,.4);
+  transition:transform .1s;
+  max-width:280px; width:100%; text-align:center;
+}
+.next-btn.show { display:flex; }
+.next-btn:active { transform:translateY(4px); box-shadow:0 0 0 #1a7a1a; }
+
+.progress-text {
+  font-family:'Press Start 2P',cursive; color:#fff; font-size:8px;
+  text-shadow:1px 1px 0 #333; text-align:center;
+  background:rgba(0,0,0,.3); padding:6px 12px; border-radius:4px;
+  margin-bottom:6px;
+}
+</style>
+</head>
+<body>
+
+<!-- CIELO -->
+<div class="sky-layer">
+  <div class="sun-pixel"></div>
+  <div class="cloud-pixel" style="top:15%;left:10%;--d:18s;--dl:0s"></div>
+  <div class="cloud-pixel" style="top:25%;left:-50px;--d:24s;--dl:7s"></div>
+  <div class="cloud-pixel" style="top:8%;left:40%;--d:20s;--dl:3s"></div>
+</div>
+
+<!-- PISO -->
+<div class="ground">
+  <div class="ground-top"></div>
+  <div class="ground-mid"></div>
+</div>
+
+<!-- TUBERÍAS -->
+<div class="pipe" style="left:8px">
+  <div class="pipe-top"></div>
+  <div class="pipe-body"></div>
+</div>
+<div class="pipe" style="right:8px">
+  <div class="pipe-top"></div>
+  <div class="pipe-body"></div>
+</div>
+
+<!-- MARIO Y LUIGI -->
+<div class="mario-sprite">🧑‍🦱</div>
+<div class="luigi-sprite">🧑‍🦱</div>
+
+<!-- MONEDAS -->
+<div style="position:fixed;top:30%;left:30%;z-index:2"><div class="coin-float">🪙</div></div>
+<div style="position:fixed;top:20%;left:55%;z-index:2"><div class="coin-float" style="animation-delay:.25s">🪙</div></div>
+<div style="position:fixed;top:35%;left:70%;z-index:2"><div class="coin-float" style="animation-delay:.5s">🪙</div></div>
+
+<!-- CONTENIDO -->
+<div class="main-content">
+  <div class="mario-title">⭐ WORLD REGALO ⭐</div>
+  <div class="score-bar">
+    <span>MARIO</span>
+    <span id="scoreVal">000000</span>
+    <span>🍄×3</span>
+  </div>
+
+  <div class="boxes-grid" id="boxesGrid">
+    <!-- Las 6 cajas se generan por JS -->
+  </div>
+
+  <div class="progress-text" id="progressText">CAJAS: 0 / 6</div>
+  <button class="next-btn" id="nextBtn" onclick="window.location.href='pagina4.html'">
+    ▶ SIGUIENTE MUNDO ▶
+  </button>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-content">
+    <div class="modal-title" id="modalTitle">¡POWER UP!</div>
+    <div class="modal-photo" id="modalPhoto"></div>
+    <div class="modal-label" id="modalLabel">¡Sorpresa!</div>
+    <button class="modal-close" onclick="closeModal()">¡GENIAL! ✨</button>
+  </div>
+</div>
+
+<script>
+// ===== DATOS DE LAS CAJAS =====
+// Cambia los emojis por tus fotos reales:
+// Para foto: { type:'photo', emoji:'🌸', label:'Tu mensaje aquí', src:'' }
+// Para video: { type:'video', emoji:'🎬', label:'¡El video especial!', src:'' }
+const boxes = [
+  { type:'photo', src:'IMG1.JPG', label:'¡Cada momento contigo es una locura! 💕', color:'#FFD700' },
+  { type:'photo', src:'IMG2.JPG', emoji:'🌟', label:'¡la vida me enseño a elegirte! ✨', color:'#FFD700' },
+  { type:'photo', src: 'IMG3.JPG', emoji:'🗓️', label:'¡Las citas contigo, son un recuerdo que queda guardado en mi 💕!', color:'#FFD700' },
+  { type:'photo', src: 'IMG4.JPG', emoji:'🌍', label:'¡Solo quiero recorrer el mundo contigo! 🌍', color:'#FFD700' },
+  { type:'photo', src: 'IMG5.JPG', emoji:'🔥', label:'¡Que sean muchos mas momentos a tu lado! 🔥', color:'#FFD700' },
+  { type:'video', emoji:'🎬', label:'¡El video sorpresa! 🔥', color:'#FF1744' },
+];
+
+let openedCount = 0;
+let score = 0;
+
+// Crear cajas
+const grid = document.getElementById('boxesGrid');
+boxes.forEach((b,i) => {
+  const div = document.createElement('div');
+  div.className = 'mario-box' + (b.type==='video' ? ' video-box' : '');
+  div.style.setProperty('--i',i);
+  div.innerHTML = `<span class="box-q">?</span>`;
+  div.onclick = () => hitBox(div, i);
+  grid.appendChild(div);
+});
+
+function hitBox(el, idx) {
+  if(el.classList.contains('opened')) return;
+  el.classList.add('opened');
+
+  // pop visual
+  const pop = document.createElement('div');
+  pop.className = 'box-pop';
+  pop.textContent = boxes[idx].type==='video' ? '🎬' : '⭐';
+  el.appendChild(pop);
+  setTimeout(()=>pop.remove(), 700);
+
+  // sonido visual (flash)
+  el.style.filter='brightness(2)';
+  setTimeout(()=>el.style.filter='',200);
+
+  openedCount++;
+  score += 100;
+  document.getElementById('scoreVal').textContent = String(score).padStart(6,'0');
+  document.getElementById('progressText').textContent = `CAJAS: ${openedCount} / 6`;
+
+  setTimeout(()=>showModal(idx), 300);
+
+  if(openedCount===6){
+    setTimeout(()=>{
+      document.getElementById('nextBtn').classList.add('show');
+      document.getElementById('progressText').textContent = '✅ ¡TODAS ABIERTAS! ✅';
+    }, 800);
+  }
+}
+
+function showModal(idx) {
+  const b = boxes[idx];
+  document.getElementById('modalTitle').textContent = b.type==='video' ? '🎬 VIDEO ESPECIAL!' : '⭐ ¡POWER UP!';
+
+  const photoDiv = document.getElementById('modalPhoto');
+  photoDiv.innerHTML='';
+
+  if(b.src) {
+    if(b.type==='video'){
+      photoDiv.innerHTML=`<video src="${b.src}" controls autoplay muted playsinline></video>`;
+    } else {
+      photoDiv.innerHTML=`<img src="${b.src}" alt="foto">`;
+    }
+  } else {
+    // placeholder emoji
+    photoDiv.innerHTML=`<span style="font-size:80px">${b.emoji}</span>`;
+  }
+
+  document.getElementById('modalLabel').textContent = b.label;
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+}
+</script>
+</body>
+</html>

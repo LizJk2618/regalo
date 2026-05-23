@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Tienes un mensaje 💌</title>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Caveat:wght@400;600;700&family=DM+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { height:100%; overflow:hidden; font-family:'DM Sans',sans-serif; }
+
+body {
+  min-height:100vh;
+  background:linear-gradient(160deg,#1a0a2e 0%,#2d0a5a 50%,#0d0518 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:30px 20px; position:relative; overflow:hidden;
+}
+
+/* fondo con partículas */
+.particle {
+  position:absolute; border-radius:50%; pointer-events:none;
+  animation:particleFloat var(--d,5s) var(--dl,0s) ease-in-out infinite;
+}
+@keyframes particleFloat {
+  0%,100%{transform:translateY(0) scale(1);opacity:.5}
+  50%{transform:translateY(-25px) scale(1.1);opacity:.9}
+}
+
+/* ===== TÍTULO ===== */
+.page-title {
+  font-family:'Pacifico',cursive;
+  color:rgba(200,150,255,.9); font-size:22px; letter-spacing:1px;
+  margin-bottom:32px; text-align:center;
+  text-shadow:0 0 30px rgba(138,43,226,.6);
+  animation:fadeUp .7s .2s both;
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* ===== SOBRE ===== */
+.envelope-scene {
+  position:relative; width:260px; height:180px;
+  cursor:pointer; margin-bottom:20px;
+  animation:envFloat 3s ease-in-out infinite, fadeUp .7s .4s both;
+  filter:drop-shadow(0 20px 40px rgba(138,43,226,.5));
+}
+.envelope-scene:active { transform:scale(.96); transition:.1s; }
+
+/* cuerpo */
+.env-body {
+  position:absolute; inset:0;
+  background:linear-gradient(135deg,#7B1FA2,#9C27B0,#CE93D8);
+  border-radius:10px; overflow:hidden;
+  box-shadow:0 10px 40px rgba(138,43,226,.4),inset 0 1px 0 rgba(255,255,255,.2);
+}
+.env-body::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(to bottom right,rgba(255,255,255,.15),transparent);
+}
+/* triángulos laterales */
+.env-left,.env-right {
+  position:absolute; top:0; bottom:0; width:50%;
+  pointer-events:none; z-index:1;
+}
+.env-left::before,.env-right::before {
+  content:''; position:absolute;
+  border:90px solid transparent;
+}
+.env-left::before {
+  left:0; top:0; bottom:0;
+  border-left-color:rgba(100,0,150,.3);
+  border-width:90px 0 90px 120px;
+}
+.env-right::before {
+  right:0; top:0; bottom:0;
+  border-right-color:rgba(100,0,150,.3);
+  border-width:90px 120px 90px 0;
+}
+
+/* solapa inferior */
+.env-bottom {
+  position:absolute; bottom:0; left:0; right:0; height:55%;
+  background:linear-gradient(135deg,#6A0DAD,#4A0080);
+  clip-path:polygon(0 100%,100% 100%,50% 0%);
+  z-index:2;
+}
+
+/* solapa superior - se abre */
+.env-top {
+  position:absolute; top:0; left:0; right:0; height:55%;
+  z-index:5; transform-origin:top center; perspective:600px;
+  transition:transform .8s cubic-bezier(.4,0,.2,1);
+}
+.env-top::before {
+  content:''; position:absolute; top:0; left:-5px; right:-5px; height:130%;
+  background:linear-gradient(135deg,#8E24AA,#5E1080);
+  clip-path:polygon(0% 0%,100% 0%,50% 100%);
+}
+.env-top.open { transform:rotateX(-170deg); }
+
+/* sello */
+.env-seal {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:44px; height:44px; border-radius:50%;
+  background:radial-gradient(circle,#FFD700,#FF8C00);
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; z-index:6;
+  box-shadow:0 0 15px rgba(255,200,0,.6);
+  transition:transform .3s, opacity .3s;
+}
+
+/* carta emergiendo */
+.env-letter {
+  position:absolute; bottom:8px; left:50%; transform:translateX(-50%);
+  width:80%; height:0; overflow:hidden;
+  background:linear-gradient(135deg,#fff9f0,#fff0e0);
+  border-radius:6px 6px 0 0; z-index:3;
+  transition:height .8s .3s cubic-bezier(.4,0,.2,1), bottom .8s .3s;
+  box-shadow:0 -4px 20px rgba(0,0,0,.3);
+}
+.env-letter.open { height:70%; bottom:40px; }
+.env-letter-content {
+  padding:8px; text-align:center;
+  font-family:'Caveat',cursive; color:#8B6914; font-size:13px; font-weight:700;
+}
+
+@keyframes envFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+/* ===== CARTA (modal) ===== */
+.letter-overlay {
+  position:fixed; inset:0; z-index:100;
+  background:rgba(0,0,0,.7); backdrop-filter:blur(4px);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:20px; opacity:0; pointer-events:none;
+  transition:opacity .4s;
+}
+.letter-overlay.show { opacity:1; pointer-events:all; }
+
+.letter-paper {
+  width:100%; max-width:340px;
+  background:#fffaf0;
+  border-radius:12px; padding:32px 28px;
+  box-shadow:0 20px 60px rgba(0,0,0,.4),0 0 0 1px rgba(201,168,76,.3);
+  position:relative; overflow:hidden;
+  max-height:75vh; overflow-y:auto;
+  animation:letterPop .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes letterPop { from{transform:scale(.7) translateY(40px);opacity:0} to{transform:scale(1) translateY(0);opacity:1} }
+
+/* líneas del papel */
+.letter-paper::before {
+  content:''; position:absolute; inset:0;
+  background-image:repeating-linear-gradient(transparent,transparent 31px,rgba(180,200,255,.3) 32px);
+  background-size:100% 32px; background-position:0 50px;
+  pointer-events:none;
+}
+/* margen rojo */
+.letter-paper::after {
+  content:''; position:absolute; top:0; left:44px; bottom:0; width:1px;
+  background:rgba(255,120,120,.35);
+}
+
+.letter-date { font-family:'Caveat',cursive; color:#8B6914; font-size:13px; text-align:right; margin-bottom:14px; }
+.letter-dear { font-family:'Caveat',cursive; color:#333; font-size:22px; font-weight:700; margin-bottom:14px; }
+.letter-body { font-family:'Caveat',cursive; color:#444; font-size:19px; line-height:1.7; margin-bottom:20px; }
+.letter-sign { font-family:'Caveat',cursive; color:#8B6914; font-size:24px; font-weight:700; text-align:right; }
+
+.next-btn {
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  margin-top:20px; width:100%;
+  background:linear-gradient(135deg,#7B1FA2,#9C27B0);
+  color:#fff; font-family:'DM Sans',sans-serif; font-size:14px;
+  letter-spacing:2px; text-transform:uppercase;
+  padding:14px 28px; border-radius:50px; cursor:pointer; border:none;
+  box-shadow:0 4px 20px rgba(138,43,226,.4);
+  transition:transform .15s;
+}
+.next-btn:active { transform:scale(.97); }
+
+/* hint */
+.tap-hint {
+  font-family:'Caveat',cursive; color:rgba(200,150,255,.7);
+  font-size:18px; text-align:center; margin-top:8px;
+  animation:tapPulse 2s ease-in-out infinite, fadeUp .7s 1.2s both;
+}
+@keyframes tapPulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+
+.sparkle {
+  position:absolute; pointer-events:none;
+  animation:spkl var(--d,3s) var(--dl,0s) ease-in-out infinite;
+  font-size:var(--fs,20px);
+}
+@keyframes spkl { 0%,100%{opacity:0;transform:scale(.5) rotate(0deg)} 50%{opacity:1;transform:scale(1) rotate(20deg)} }
+</style>
+</head>
+<body>
+
+<!-- Partículas fondo -->
+<script>
+for(let i=0;i<20;i++){
+  const p=document.createElement('div');
+  const colors=['rgba(138,43,226,.4)','rgba(200,100,255,.3)','rgba(255,215,0,.2)'];
+  const s=4+Math.random()*10;
+  p.className='particle';
+  p.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${s}px;height:${s}px;background:${colors[Math.floor(Math.random()*3)]};--d:${3+Math.random()*4}s;--dl:${Math.random()*3}s`;
+  document.body.appendChild(p);
+}
+</script>
+
+<!-- Sparkles -->
+<div class="sparkle" style="--fs:24px;--d:2.5s;--dl:0s;top:12%;left:8%">💜</div>
+<div class="sparkle" style="--fs:18px;--d:3s;--dl:.6s;top:18%;right:10%">✨</div>
+<div class="sparkle" style="--fs:20px;--d:2s;--dl:1s;bottom:20%;left:10%">⭐</div>
+<div class="sparkle" style="--fs:16px;--d:3.5s;--dl:.3s;bottom:15%;right:8%">💫</div>
+
+<div class="page-title">📬 Tienes un mensaje especial</div>
+
+<!-- SOBRE -->
+<div class="envelope-scene" id="envelope" onclick="openEnvelope()">
+  <div class="env-body">
+    <div class="env-left"></div>
+    <div class="env-right"></div>
+  </div>
+  <div class="env-bottom"></div>
+  <div class="env-top" id="envTop"></div>
+  <div class="env-letter" id="envLetter">
+    <div class="env-letter-content">💌</div>
+  </div>
+  <div class="env-seal" id="envSeal">💜</div>
+</div>
+
+<div class="tap-hint" id="hint">Toca el sobre para abrirlo</div>
+
+<!-- CARTA MODAL -->
+<div class="letter-overlay" id="letterOverlay">
+  <div class="letter-paper">
+    <div class="letter-date">Para ti, mi amor 💛</div>
+    <div class="letter-dear">Mi amor,</div>
+    <div class="letter-body">
+      Hace aproximadamente un año coincidimos en el mismo lugar, sin buscarnos resultamos cruzados. 🌟<br><br>
+      Agradezco al destino por ponerme ese día ahí contigo.<br><br>
+      Solo quiero recordarte que todo este tiempo he disfrutado de que estés en mi vida, de tenerte a mi lado y por fin como pareja...<br><br>
+      Como el hombre que quiero construir todo, el hombre con el que quiero pasar el resto de mi vida, el hombre que quiero que corra conmigo. 🌊<br><br>
+      Solo te agradezco por permitirme compartir contigo, por la paciencia que me tienes.<br><br>
+      Y quiero que sepas que cada día nos elegimos, a pesar de los obstáculos que tenemos como pareja, nos levantamos juntos. 💪🏽<br><br>
+      Quiero recordarte también de mi amor hacia a ti... el gran hombre que eres. Te admiro como ser, como hombre, como novio. 💜<br><br>
+      Estoy orgullosa de ti mi amor.<br><br>
+      El te amo viene desde el alma. Contigo pude entregar esa alma y la has cuidado.<br><br>
+      <strong style="color:#8B6914">Te elijo una y mil veces mi amor.</strong><br><br>
+      Te amo. 🌹
+    </div>
+    <div class="letter-sign">Eres el hombrecito de mi vida💛🌺</div>
+
+    <button class="next-btn" onclick="window.location.href='pagina3.html'">
+      Siguiente ✨ →
+    </button>
+  </div>
+</div>
+
+<script>
+let opened = false;
+function openEnvelope() {
+  if(opened) return;
+  opened = true;
+  document.getElementById('envTop').classList.add('open');
+  document.getElementById('envLetter').classList.add('open');
+  document.getElementById('envSeal').style.cssText='transform:translate(-50%,-50%) scale(0);opacity:0';
+  document.getElementById('hint').textContent='¡Toca la carta! 💌';
+  document.getElementById('envelope').onclick = () => {
+    document.getElementById('letterOverlay').classList.add('show');
+  };
+}
+</script>
+</body>
+</html>
